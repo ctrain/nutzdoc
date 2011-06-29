@@ -48,7 +48,7 @@ public class HtmlDocRenderTest {
 
 	@Test
 	public void someEles() {
-		HtmlDocRender render = new HtmlDocRender();
+		HtmlRenderSupport render = new HtmlDocRender();
 		String expect = "<span style=\"color:#FF0000;\"><b>A</b></span>";
 		String s = "{#F00;*A}";
 		ZBlock root = root(s);
@@ -59,7 +59,7 @@ public class HtmlDocRenderTest {
 
 	@Test
 	public void test_relative_link() {
-		HtmlDocRender render = new HtmlDocRender();
+		HtmlRenderSupport render = new HtmlDocRender();
 		String expect = "<a href=\"abc.html\">ABC</a>";
 		String s = "[abc.html ABC]";
 		ZBlock root = root(s);
