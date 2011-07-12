@@ -78,7 +78,7 @@ public class HtmlDocSetRender implements DocSetRender {
 		fs = src.listFiles(new FileFilter() {
 			public boolean accept(File f) {
 				if (f.isDirectory())
-					if (f.getName().charAt(0) == '.')
+					if (f.getName().charAt(0) == '.' || f.getName().charAt(0) == '_')
 						return false;
 					else
 						return true;
