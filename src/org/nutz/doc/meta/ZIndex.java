@@ -28,7 +28,7 @@ public class ZIndex {
 		this.text = text;
 	}
 
-	public void setNumbers(int[] numbers) {
+	public void setNumbers(int... numbers) {
 		this.numbers = numbers;
 	}
 

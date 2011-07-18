@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.nutz.doc.RenderLogger;
 import org.nutz.doc.meta.ZD;
@@ -14,12 +16,14 @@ import org.nutz.doc.meta.ZEle;
 import org.nutz.doc.meta.ZFolder;
 import org.nutz.doc.meta.ZIndex;
 import org.nutz.doc.meta.ZItem;
+import org.nutz.doc.util.Funcs;
 import org.nutz.lang.Files;
 import org.nutz.lang.Lang;
 import org.nutz.lang.Stopwatch;
 import org.nutz.lang.segment.Segments;
 import org.nutz.lang.util.Disks;
 import org.nutz.lang.util.Node;
+import org.nutz.lang.util.Nodes;
 import org.nutz.lang.util.Tag;
 
 class WebsiteRendering {
@@ -108,6 +112,19 @@ class WebsiteRendering {
 		// zDoc 转换 ...
 		else if (nd.get() instanceof ZDoc) {
 			ZDoc doc = (ZDoc) nd.get();
+			// 修改所有的站内链接
+			for (ZEle lnk : doc.root().getLinks()) {
+				File f = lnk.getHref().getFile();
+				if (null != f) {
+					String path = Disks.getRelativePath(setHome, f);
+					String newPath = "#" + Files.renameSuffix(path, suffix);
+					if (lnk.getHref().hasInner())
+						newPath += "#" + lnk.getHref().getInner();
+					L.log4(" %s => %s", lnk.getHref().getPath(), newPath);
+					lnk.setHref(ZD.refer(newPath));
+				}
+			}
+
 			Tag html = render.render(doc);
 			// 得到相对路径
 			String rePath = Disks.getRelativePath(set.getSrc(), doc.getSource());
@@ -118,6 +135,10 @@ class WebsiteRendering {
 					Disks.getRelativePath(set.getSrc(), doc.getSource()),
 					Disks.getRelativePath(dest.getAbsolutePath(), f.getAbsolutePath()));
 			Files.write(f, html.toString());
+		}
+		// 哦，这不可能
+		else {
+			throw Lang.impossible();
 		}
 	}
 
@@ -146,8 +167,28 @@ class WebsiteRendering {
 		/*
 		 * 生成整个 DocSet 的索引，并将 index.tmpl 输出成 index.html
 		 */
-		L.log1("Rendering index.tmpl");
+		L.log1("Parse index table");
 		Node<ZIndex> node = set.createIndexTable();
+
+		// 将所有的顶层 ZDoc 节点放入一个 Home 节点
+		L.log1("Format index table");
+		List<Node<ZIndex>> topDocNodes = new ArrayList<Node<ZIndex>>();
+		for (Node<ZIndex> top : node.getChildren()) {
+			if (!top.hasChild()) {
+				topDocNodes.add(top);
+				top.remove();
+			}
+		}
+		ZIndex homeIndex = new ZIndex();
+		homeIndex.setNumbers(0);
+		homeIndex.setText("Home");
+		Node<ZIndex> homeNode = Nodes.create(homeIndex);
+		for (Node<ZIndex> tn : topDocNodes)
+			homeNode.add(tn);
+		node.addFirst(homeNode);
+		Funcs.formatZIndexNumber(node);
+		L.log2(node.toString());
+
 		// 更新链接的后缀
 		Iterator<Node<ZIndex>> it = node.iterator();
 		while (it.hasNext()) {
@@ -157,6 +198,7 @@ class WebsiteRendering {
 			}
 		}
 		// 生成 DOM
+		L.log1("Rendering index.tmpl");
 		Tag tag = render.renderIndexTable(node);
 		// 渲染模板
 		String html = Segments.read(indexTmpl).set("html", tag.toString()).render().toString();

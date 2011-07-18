@@ -8,7 +8,6 @@ import java.util.List;
 import org.nutz.doc.util.Funcs;
 import org.nutz.lang.Strings;
 import org.nutz.lang.util.IntRange;
-import org.nutz.lang.util.LinkedIntArray;
 import org.nutz.lang.util.Node;
 import org.nutz.lang.util.Nodes;
 
@@ -285,43 +284,30 @@ public class ZBlock {
 	}
 
 	public Node<ZIndex> buildIndex(IntRange range) {
-		LinkedIntArray nums = new LinkedIntArray(20);
-		Node<ZIndex> root = Nodes.create(ZD.index(null, null, doc.getTitle()));
-		nums.push(-1);
+		Node<ZIndex> root = Nodes.create(ZD.index(null, doc.getTitle()));
 		for (ZBlock chd : children) {
 			if (chd.isHeading()) {
-				nums.push(nums.popLast() + 1);
-				_buildIndex(nums, root, range, chd);
+				_buildIndex(root, range, chd);
 			}
 		}
-		return root;
+		return Funcs.formatZIndexNumber(root);
 	}
 
-	private static void _buildIndex(LinkedIntArray nums,
-									Node<ZIndex> node,
-									IntRange range,
-									ZBlock me) {
+	private static void _buildIndex(Node<ZIndex> node, IntRange range, ZBlock me) {
 		int lvl = me.depth() - 1;
-		int depth = nums.size();
 		if (range.inon(lvl)) {
-			Node<ZIndex> newNode = Nodes.create(ZD.index(	"#"
-																	+ Funcs.evalAnchorName(me.getText()),
-															nums.toArray(),
-															me.getText()));
+			String anText = Funcs.evalAnchorName(me.getText());
+			Node<ZIndex> newNode = Nodes.create(ZD.index("#" + anText, me.getText()));
 			node.add(newNode);
 			node = newNode;
 		}
 		if (!range.lt(lvl)) {
-			nums.push(-1);
 			for (ZBlock chd : me.children) {
 				if (chd.isHeading()) {
-					nums.push(nums.popLast() + 1);
-					_buildIndex(nums, node, range, chd);
+					_buildIndex(node, range, chd);
 				}
 			}
 		}
-		if (nums.size() > depth)
-			nums.popLast(nums.size() - depth);
 	}
 
 	public List<ZEle> getImages() {

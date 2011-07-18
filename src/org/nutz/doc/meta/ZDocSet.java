@@ -2,6 +2,7 @@ package org.nutz.doc.meta;
 
 import java.io.File;
 
+import org.nutz.doc.util.Funcs;
 import org.nutz.lang.Files;
 import org.nutz.lang.Lang;
 import org.nutz.lang.util.Disks;
@@ -80,15 +81,15 @@ public class ZDocSet {
 		if (zi instanceof ZDoc)
 			href = Disks.getRelativePath(rootDir.getAbsolutePath(), ((ZDoc) zi).getSource());
 
-		Node<ZIndex> re = Nodes.create(ZD.index(href, numbers.toArray(), text));
+		ZIndex zindex = ZD.index(href, text);
+		Node<ZIndex> re = Nodes.create(zindex);
 
 		// Render Children Nodes
-		numbers.push(0);
 		for (Node<ZItem> child : root.getChildren()) {
 			re.add(_createIndexTable(numbers, rootDir, child));
-			numbers.set(numbers.size() - 1, numbers.last() + 1);
 		}
-		numbers.popLast();
-		return re;
+
+		return Funcs.formatZIndexNumber(re);
 	}
+
 }
