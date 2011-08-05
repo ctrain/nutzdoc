@@ -44,7 +44,7 @@ public class ZDocSetParser implements DocSetParser {
 			throw Lang.makeThrow("Source '%s' must be a directory!", src);
 
 		File indexml = Files.getFile(dir, indexmlPath);
-		ZDocSet set = new ZDocSet(dir.getName()).setSrc(src);
+		ZDocSet set = new ZDocSet(dir.getName()).setSrc(dir.getAbsolutePath());
 		try {
 			if (indexml.exists())
 				(new IndexXmlSetParing(indexml, dir)).doParse(set);
