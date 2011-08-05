@@ -18,6 +18,10 @@ public class ZDocTask {
 	private String suffix;
 
 	private String indexXml;
+	
+	private String imageAddress;
+	
+	private String indexWikiName;
 
 	public void execute() throws IOException, ZDocException {
 		if (src == null || dest == null)
@@ -32,6 +36,10 @@ public class ZDocTask {
 		cc.setDest(dest);
 		if (indexXml != null)
 			cc.addArg(indexXml);
+		if (indexWikiName != null)
+			cc.addArg(indexWikiName);
+		if (imageAddress != null)
+			cc.addArg(imageAddress);
 		adaptor.adapt(cc);
 		ZDocSet set = cc.getParser().parse(cc.getSrc());
 		cc.getRender().render(cc.getDest(), set);
@@ -51,5 +59,13 @@ public class ZDocTask {
 
 	public void setIndexXml(String indexXml) {
 		this.indexXml = indexXml;
+	}
+	
+	public void setImageAddress(String imageAddress) {
+		this.imageAddress = imageAddress;
+	}
+	
+	public void setIndexWikiName(String indexWikiName) {
+		this.indexWikiName = indexWikiName;
 	}
 }
