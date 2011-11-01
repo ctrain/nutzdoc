@@ -161,7 +161,8 @@ public class BlockMaker {
 			sb.append(c);
 		}
 		ep.ele.setHref(refer(sb.toString()));
-		if (cs[i] != ']') {
+		//i可能超过cs的长度,从而导致数组越界
+		if (i >= cs.length || cs[i] != ']') {
 			endles.push(']');
 			reading();
 		}
