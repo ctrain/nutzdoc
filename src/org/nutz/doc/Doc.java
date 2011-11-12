@@ -3,6 +3,7 @@ package org.nutz.doc;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.nutz.doc.chm.ChmAdaptor;
 import org.nutz.doc.googlewiki.GoogleWikiAdaptor;
 import org.nutz.doc.html.HtmlAdaptor;
 import org.nutz.doc.meta.ZDocSet;
@@ -28,6 +29,7 @@ public class Doc {
 		convertAdaptorMap.put("pdf", new PdfAdaptor());
 		convertAdaptorMap.put("rtf", new RtfAdaptor());
 		convertAdaptorMap.put("site", new WebsiteAdaptor());
+		convertAdaptorMap.put("chm", new ChmAdaptor());
 	}
 
 	public static void main(String[] args) throws Exception {
