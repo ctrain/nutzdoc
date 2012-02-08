@@ -3,7 +3,9 @@ package org.nutz.doc.zdoc;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Calendar;
+import java.util.Date;
 
+import org.nutz.doc.meta.ZDoc;
 import org.nutz.doc.meta.ZDocSet;
 import org.nutz.doc.meta.ZFolder;
 import org.nutz.doc.meta.ZItem;
@@ -71,7 +73,9 @@ public class NoIndexSetParsing {
 		}
 		// 文件
 		else if (f.isFile() && f.getName().toLowerCase().matches(regex)) {
-			re = docParser.parse(Streams.fileInr(f)).setSource(f.getAbsolutePath());
+			ZDoc doc = docParser.parse(Streams.fileInr(f));
+			doc.setTime(new Date(f.lastModified()));
+			re = doc.setSource(f.getAbsolutePath());
 		}
 		return re;
 	}

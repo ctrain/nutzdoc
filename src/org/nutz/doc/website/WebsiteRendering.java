@@ -112,16 +112,24 @@ class WebsiteRendering {
 		// zDoc 转换 ...
 		else if (nd.get() instanceof ZDoc) {
 			ZDoc doc = (ZDoc) nd.get();
-			// 修改所有的站内链接
+			L.log4("links:%d",doc.root().getLinks().size());
+			// 修改所有的站内链接 TODO 好奇怪。。。 trans_content_transform.zdoc 竟然没页内链接...
 			for (ZEle lnk : doc.root().getLinks()) {
-				File f = lnk.getHref().getFile();
-				if (null != f) {
-					String path = Disks.getRelativePath(setHome, f);
-					String newPath = "#" + Files.renameSuffix(path, suffix);
-					if (lnk.getHref().hasInner())
-						newPath += "#" + lnk.getHref().getInner();
+				if (lnk.getHref().getPath().startsWith("#")) {
+					String path = doc.getRelativePath(setHome.getAbsolutePath());
+					String newPath = "#" + path + lnk.getHref().getPath();
 					L.log4(" %s => %s", lnk.getHref().getPath(), newPath);
 					lnk.setHref(ZD.refer(newPath));
+				} else {
+					File f = lnk.getHref().getFile();
+					if (null != f) {
+						String path = Disks.getRelativePath(setHome, f);
+						String newPath = "#" + Files.renameSuffix(path, suffix);
+						if (lnk.getHref().hasInner())
+							newPath += "#" + lnk.getHref().getInner();
+						L.log4(" %s => %s", lnk.getHref().getPath(), newPath);
+						lnk.setHref(ZD.refer(newPath));
+					}
 				}
 			}
 

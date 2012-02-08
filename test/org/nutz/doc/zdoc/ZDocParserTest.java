@@ -16,6 +16,21 @@ import org.nutz.lang.util.Node;
 import static org.nutz.doc.zdoc.ZDocUnits.*;
 
 public class ZDocParserTest {
+	
+	@Test
+	public void test_getlinks() {
+		String s = "#title:abc\n";
+		s = s + "\nHeading";
+		s = s + "\n    dasf[#xyz]ttt";
+		ZDoc doc = doc(s);
+		List<ZEle> lnks = doc.root().getLinks();
+		assertEquals(1,lnks.size());
+		assertEquals("xyz",lnks.get(0).getHref().getInner());
+		
+		lnks = doc.root().getLinks();
+		assertEquals(1,lnks.size());
+		assertEquals("xyz",lnks.get(0).getHref().getInner());
+	}
 
 	@Test
 	public void test_doc_title() {

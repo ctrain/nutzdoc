@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.nutz.castor.Castors;
 import org.nutz.lang.Files;
 import org.nutz.lang.Strings;
 import org.nutz.lang.util.Disks;
@@ -22,6 +23,8 @@ public class ZDoc extends ZItem {
 	private static final String META_VERIFIER = "verifier";
 
 	private static final String META_AUTHOR = "author";
+
+	private static final String META_TIME = "time";
 
 	public ZDoc() {
 		super();
@@ -95,6 +98,10 @@ public class ZDoc extends ZItem {
 		return metas.get(name);
 	}
 
+	public String[] metaNames() {
+		return metas.keySet().toArray(new String[metas.size()]);
+	}
+
 	public boolean hasMeta(String name) {
 		List<String> list = metas.get(name);
 		return null != list && list.size() > 0;
@@ -139,6 +146,14 @@ public class ZDoc extends ZItem {
 
 	public ZItem addAuthor(String author) {
 		return addMeta(META_AUTHOR, author);
+	}
+
+	public ZItem setTime(java.util.Date d) {
+		return addMeta(META_TIME, Castors.me().castToString(d));
+	}
+
+	public String getTime() {
+		return getMeta(META_TIME);
 	}
 
 	public ZItem addVerifier(String verifier) {

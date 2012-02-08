@@ -2,7 +2,9 @@ package org.nutz.doc.zdoc;
 
 import java.io.File;
 import java.util.Calendar;
+import java.util.Date;
 
+import org.nutz.doc.meta.ZDoc;
 import org.nutz.doc.meta.ZDocSet;
 import org.nutz.doc.meta.ZFolder;
 import org.nutz.doc.meta.ZItem;
@@ -113,7 +115,9 @@ class IndexXmlSetParing {
 		}
 		// 这是文件，解析成 ZDoc
 		else {
-			zi = this.docParser.parse(Streams.fileInr(f)).setSource(f.getAbsolutePath());
+			ZDoc doc = this.docParser.parse(Streams.fileInr(f));
+			doc.setTime(new Date(f.lastModified()));
+			zi = doc.setSource(f.getAbsolutePath());
 			appendAuthors(ele, zi);
 		}
 		return zi;
