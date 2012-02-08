@@ -43,6 +43,7 @@ class Line {
 	 */
 	Line(String txt) {
 		if (null != txt) {
+			//TODO txt明显不为null
 			this.text = null == txt ? "" : txt;
 			children = new ArrayList<Line>();
 			evalMode();
