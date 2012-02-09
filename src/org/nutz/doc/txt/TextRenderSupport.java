@@ -120,7 +120,7 @@ public class TextRenderSupport {
 
 	protected void renderListItem(int index, StringBuilder sb, ZBlock li) {
 		sb.append(Strings.dup("  ", li.depth()));
-		sb.append(li.isOLI() ? " " + (index + 1) + ". " : " * ");
+		sb.append(li.isOLI() ? " " + Strings.alignRight((index + 1), 2, ' ') + ". " : " * ");
 		sb.append(li.getText());
 		sb.append("\n");
 	}

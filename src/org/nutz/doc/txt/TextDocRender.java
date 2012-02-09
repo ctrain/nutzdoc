@@ -14,7 +14,7 @@ public class TextDocRender extends TextRenderSupport implements DocRender<String
 		StringBuilder sb = new StringBuilder();
 
 		// 标题
-		if (!Strings.isBlank(doc.getTitle())){
+		if (!Strings.isBlank(doc.getTitle())) {
 			sb.append(Strings.dup('#', 60));
 			sb.append("\n# ");
 			sb.append("\n#    《").append(doc.getTitle()).append("》");
@@ -37,6 +37,9 @@ public class TextDocRender extends TextRenderSupport implements DocRender<String
 		ZBlock[] ps = doc.root().children();
 		for (ZBlock p : ps)
 			renderBlock(sb, p);
+
+		// 空行
+		sb.append("\n\n");
 
 		// 结束
 		sb.append(Strings.dup('-', 30)).append(" The End ").append(Strings.dup('-', 30));
