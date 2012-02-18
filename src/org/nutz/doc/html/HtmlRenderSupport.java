@@ -3,6 +3,9 @@ package org.nutz.doc.html;
 import static org.nutz.lang.util.Tag.tag;
 import static org.nutz.lang.util.Tag.text;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.nutz.doc.meta.Author;
 import org.nutz.doc.meta.ZBlock;
 import org.nutz.doc.meta.ZDoc;
@@ -108,7 +111,22 @@ public class HtmlRenderSupport {
 		}
 		// <Pre>
 		else if (block.isCode()) {
-			parent.add(tag("pre").add(text(block.getText())));
+			Tag pre = tag("pre");
+			String[] lines = block.getText().split("[\r]?\n");
+			for (String line : lines) {
+				// 替换注释行
+				// TODO 让 tag 支持真正的 html 解析
+				Matcher m = REG_CMT.matcher(line);
+				if (m.find()) {
+					String s = line.substring(0, m.start());
+					String cmt = line.substring(m.start()) + "\n";
+					pre.add(text(s)).add(tag("span").attr("class", "zdoc_code_cmt").add(text(cmt)));
+				} else {
+					pre.add(text(line + "\n"));
+				}
+			}
+			// 加入 DOM
+			parent.add(pre);
 		}
 		// <H1~6>
 		else if (block.isHeading()) {
@@ -122,6 +140,8 @@ public class HtmlRenderSupport {
 			parent.add(renderToHtmlBlockElement(tag("p"), block.eles()));
 		}
 	}
+
+	private static final Pattern REG_CMT = Pattern.compile("(//|#)(.*)$");
 
 	public Tag renderIndexTable(Node<ZIndex> indexRoot) {
 		if (!indexRoot.hasChild())
