@@ -5,6 +5,7 @@ import java.io.Reader;
 
 import org.nutz.doc.DocParser;
 import org.nutz.doc.meta.ZDoc;
+import org.nutz.lang.Lang;
 import org.nutz.lang.Streams;
 import org.nutz.lang.util.Context;
 
@@ -17,13 +18,17 @@ public class ZDocParser implements DocParser {
 
 	private Context context;
 
-	public ZDocParser(Context context) {
-		this(4);
-		this.context = context;
+	public ZDocParser() {
+		this(Lang.context(), 4);
 	}
 
-	public ZDocParser(int tabpar) {
+	public ZDocParser(Context context) {
+		this(context, 4);
+	}
+
+	public ZDocParser(Context context, int tabpar) {
 		this.tabpar = tabpar;
+		this.context = context;
 	}
 
 	public ZDoc parse(Reader reader) {
