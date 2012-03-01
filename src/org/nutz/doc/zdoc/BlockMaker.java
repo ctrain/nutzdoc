@@ -151,7 +151,15 @@ public class BlockMaker {
 	private void forLink() {
 		updateBlock();
 		StringBuilder sb = new StringBuilder();
-		for (++i; i < cs.length; i++) {
+		boolean blank = false;
+		// 看看是不是新窗口打开
+		i++;
+		if ('~' == cs[i]) {
+			blank = true;
+			i++;
+		}
+
+		for (; i < cs.length; i++) {
 			char c = cs[i];
 			if (c == ' ' || c == '\t') {
 				i++;
@@ -160,8 +168,8 @@ public class BlockMaker {
 				break;
 			sb.append(c);
 		}
-		ep.ele.setHref(refer(sb.toString()));
-		//i可能超过cs的长度,从而导致数组越界
+		ep.ele.setHref(refer(sb.toString()).setBlank(blank));
+		// i可能超过cs的长度,从而导致数组越界
 		if (i >= cs.length || cs[i] != ']') {
 			endles.push(']');
 			reading();

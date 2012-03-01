@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<doc title="zDoc 手册" author="zozoh(zozohtnt@gmail.com)">
+    <doc path="about_zdoc.zdoc"/>
+    <doc path="install.zdoc" title="如何安装">
+    </doc>
+	<doc path="useage" title="如何使用">
+		<doc path="syntax.zdoc"/>
+		<doc path="index_xml.zdoc"/>
+		<doc path="dir_convert.zdoc"/>
+		<doc path="ant_task.zdoc"/>
+	</doc>
+	<doc path="history" title="版本历史">
+		<doc path="1.16.zdoc"/>
+	</doc>
+</doc>

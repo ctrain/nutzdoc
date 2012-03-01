@@ -16,8 +16,9 @@ import org.nutz.lang.util.Tag;
 class WebsiteDocRender extends HtmlRenderSupport implements DocRender<Tag> {
 
 	WebsiteDocRender() {
-		this.setSkipAllIndexBlock(true);
-		this.setNotShowTopInEachSection(true);
+		this.skip_index_block = true;
+		this.hide_anchor_for_header = true;
+		this.hide_top_for_each_section = true;
 	}
 
 	@Override

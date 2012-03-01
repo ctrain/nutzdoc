@@ -14,11 +14,19 @@ public class ZRefer {
 	 * 有效值
 	 */
 	private String value;
+
+	/**
+	 * 是否在新窗口打开
+	 */
+	private boolean blank;
+
 	/**
 	 * 原始值
 	 */
 	private String path;
+
 	private ZEle ele;
+
 	private TYPE type;
 	/**
 	 * 业内链接名称 - 出现 #xxx
@@ -67,6 +75,15 @@ public class ZRefer {
 
 	public ZRefer setEle(ZEle ele) {
 		this.ele = ele;
+		return this;
+	}
+
+	public boolean isBlank() {
+		return blank;
+	}
+
+	public ZRefer setBlank(boolean blank) {
+		this.blank = blank;
 		return this;
 	}
 

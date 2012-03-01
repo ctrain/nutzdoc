@@ -21,25 +21,11 @@ public class HtmlRenderSupport {
 
 	public static final String COMMON_INFO = "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">";
 
-	private boolean skipAllIndexBlock;
+	protected boolean skip_index_block;
 
-	private boolean notShowTopInEachSection;
+	protected boolean hide_top_for_each_section;
 
-	public boolean isSkipAllIndexBlock() {
-		return skipAllIndexBlock;
-	}
-
-	public void setSkipAllIndexBlock(boolean skipAllIndexBlock) {
-		this.skipAllIndexBlock = skipAllIndexBlock;
-	}
-
-	public boolean isNotShowTopInEachSection() {
-		return notShowTopInEachSection;
-	}
-
-	public void setNotShowTopInEachSection(boolean notShowTopInEachSection) {
-		this.notShowTopInEachSection = notShowTopInEachSection;
-	}
+	protected boolean hide_anchor_for_header;
 
 	protected static Tag appendAuthorTag(ZDoc doc, Tag ele) {
 		appendAuthors(ele, "By:", doc.authors());
@@ -76,21 +62,24 @@ public class HtmlRenderSupport {
 				}
 				tab.add(tagTr);
 			}
-			parent.add(tab);
+			if (null != parent)
+				parent.add(tab);
 		}
 		// <Hr>
 		else if (block.isHr()) {
 			// parent.add(tag("hr"));
-			parent.add(Tag.tag("div", ".hr").add(Tag.tag("b")));
+			if (null != parent)
+				parent.add(Tag.tag("div", ".hr").add(Tag.tag("b")));
 		}
 		// #index:
 		else if (block.isIndexRange()) {
-			if (!skipAllIndexBlock) {
+			if (!skip_index_block) {
 				// parent.add(renderIndexTable(block.getDoc().buildIndex(block.getIndexRange())));
 				Node<ZIndex> indexRoot = block.getDoc().root().buildIndex(block.getIndexRange());
 				Tag indexTable = renderIndexTable(indexRoot);
 				if (null != indexTable)
-					parent.add(indexTable);
+					if (null != parent)
+						parent.add(indexTable);
 			}
 		}
 		// <OL>
@@ -99,7 +88,8 @@ public class HtmlRenderSupport {
 			for (ZBlock li : block.children()) {
 				renderListItem(tag, li);
 			}
-			parent.add(tag);
+			if (null != parent)
+				parent.add(tag);
 		}
 		// <UL>
 		else if (block.isUL()) {
@@ -107,7 +97,8 @@ public class HtmlRenderSupport {
 			for (ZBlock li : block.children()) {
 				renderListItem(tag, li);
 			}
-			parent.add(tag);
+			if (null != parent)
+				parent.add(tag);
 		}
 		// <Pre>
 		else if (block.isCode()) {
@@ -126,7 +117,8 @@ public class HtmlRenderSupport {
 				}
 			}
 			// 加入 DOM
-			parent.add(pre);
+			if (null != parent)
+				parent.add(pre);
 		}
 		// <H1~6>
 		else if (block.isHeading()) {
@@ -137,7 +129,8 @@ public class HtmlRenderSupport {
 		}
 		// <P>
 		else {
-			parent.add(renderToHtmlBlockElement(tag("p"), block.eles()));
+			if (null != parent && block.eleCount() > 0)
+				parent.add(renderToHtmlBlockElement(tag("p"), block.eles()));
 		}
 	}
 
@@ -206,10 +199,12 @@ public class HtmlRenderSupport {
 
 	protected void renderHeading(Tag parent, ZBlock block) {
 		Tag hn = tag("h" + (block.depth()));
-		hn.add(tag("a").attr("name", Funcs.evalAnchorName(block.getText())));
+		// 显示锚
+		if (!hide_anchor_for_header)
+			hn.add(tag("a").attr("name", Funcs.evalAnchorName(block.getText())));
 		parent.add(renderToHtmlBlockElement(hn, block.eles()));
 		// 显示 #top 链接
-		if (!notShowTopInEachSection) {
+		if (!hide_top_for_each_section) {
 			Tag div = tag("div").attr("style", "float:right;");
 			div.add(tag("a").attr("href", "#top").add(text("Top")));
 			parent.add(div);
@@ -242,8 +237,12 @@ public class HtmlRenderSupport {
 				tag.attr("width", ele.getWidth());
 			if (ele.getHeight() > 0)
 				tag.attr("height", ele.getHeight());
-			if (ele.hasHref() && !ele.getHref().isBookmark())
-				tag = (Tag) tag("a").attr("href", ele.getHref().getPath()).add(tag);
+			if (ele.hasHref() && !ele.getHref().isBookmark()) {
+				Tag eleA = tag("a").attr("href", ele.getHref().getPath());
+				if (ele.getHref().isBlank())
+					eleA.attr("target", "_blank");
+				tag = (Tag) eleA.add(tag);
+			}
 			return tag;
 		} else if (!Strings.isEmpty(ele.getText())) {
 			tag = text(ele.getText());
@@ -265,8 +264,12 @@ public class HtmlRenderSupport {
 		}
 		// 加链接
 		if (ele.hasHref())
-			if (ele.getHref().isAvailable())
-				tag = (Tag) tag("a").attr("href", ele.getHref().getPath()).add(tag);
+			if (ele.getHref().isAvailable()) {
+				Tag eleA = tag("a").attr("href", ele.getHref().getPath());
+				if (ele.getHref().isBlank())
+					eleA.attr("target", "_blank");
+				tag = (Tag) eleA.add(tag);
+			}
 		return tag;
 	}
 

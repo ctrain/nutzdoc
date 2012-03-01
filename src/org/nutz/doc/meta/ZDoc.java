@@ -61,6 +61,19 @@ public class ZDoc extends ZItem {
 		return attrs.get(name);
 	}
 
+	@SuppressWarnings("unchecked")
+	public <T> T getAttrAs(Class<T> type, String name) {
+		return (T) getAttr(name);
+	}
+
+	public int getAttrInt(String name) {
+		return getAttrAs(Integer.class, name);
+	}
+
+	public String getAttrString(String name) {
+		return getAttrAs(String.class, name);
+	}
+
 	public boolean hasAttr(String name) {
 		return attrs.containsKey(name);
 	}
