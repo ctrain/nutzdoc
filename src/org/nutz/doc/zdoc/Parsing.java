@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.nutz.doc.meta.ZBlock;
 import org.nutz.doc.meta.ZDoc;
+import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
 import org.nutz.lang.util.Context;
 import org.nutz.lang.util.LinkedCharArray;
@@ -129,7 +130,12 @@ class Parsing {
 	}
 
 	private ZBlock toBlock(char[] cs) {
-		return new BlockMaker(context, cs).make();
+		try {
+			return new BlockMaker(context, cs).make();
+		}
+		catch (Exception e) {
+			throw Lang.wrapThrow(e, "Error line '%s'", new String(cs));
+		}
 	}
 
 	private ZBlock makeBlockAndClearStack(LinkedList<Line> stack) {

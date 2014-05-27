@@ -115,7 +115,13 @@ class IndexXmlSetParing {
 		}
 		// 这是文件，解析成 ZDoc
 		else {
-			ZDoc doc = this.docParser.parse(Streams.fileInr(f));
+			ZDoc doc;
+			try {
+				doc = this.docParser.parse(Streams.fileInr(f));
+			}
+			catch (Exception e) {
+				throw Lang.wrapThrow(e, "Fail to parse '%s'", f);
+			}
 			doc.setTime(new Date(f.lastModified()));
 			zi = doc.setSource(f.getAbsolutePath());
 			appendAuthors(ele, zi);

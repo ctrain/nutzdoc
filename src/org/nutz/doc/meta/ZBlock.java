@@ -13,327 +13,331 @@ import org.nutz.lang.util.Nodes;
 
 public class ZBlock {
 
-	private ZType type;
-	private String title;
-	private ZDoc doc;
-	List<ZEle> eles;
-	List<ZBlock> children;
-	private ZBlock parent;
-	private IntRange indexRange;
+    private ZType type;
+    private String title;
+    private ZDoc doc;
+    List<ZEle> eles;
+    List<ZBlock> children;
+    private ZBlock parent;
+    private IntRange indexRange;
 
-	ZBlock() {
-		this.eles = new ArrayList<ZEle>();
-		this.children = new ArrayList<ZBlock>();
-	}
+    ZBlock() {
+        this.eles = new ArrayList<ZEle>();
+        this.children = new ArrayList<ZBlock>();
+    }
 
-	public ZBlock append(ZEle ele) {
-		eles.add(ele.setBlock(this));
-		return this;
-	}
+    public ZBlock append(ZEle ele) {
+        eles.add(ele.setBlock(this));
+        return this;
+    }
 
-	public ZEle[] eles() {
-		return eles.toArray(new ZEle[eles.size()]);
-	}
+    public ZEle[] eles() {
+        return eles.toArray(new ZEle[eles.size()]);
+    }
 
-	public ZEle ele(int index) {
-		return eles.get(index);
-	}
+    public ZEle ele(int index) {
+        return eles.get(index);
+    }
 
-	public ZBlock add(ZBlock p) {
-		p.setParent(this);
-		children.add(p);
-		return this;
-	}
+    public ZBlock add(ZBlock p) {
+        p.setParent(this);
+        children.add(p);
+        return this;
+    }
 
-	public ZBlock[] children() {
-		return children.toArray(new ZBlock[children.size()]);
-	}
+    public ZBlock[] children() {
+        return children.toArray(new ZBlock[children.size()]);
+    }
 
-	public ZBlock desc(int... indexes) {
-		ZBlock re = this;
-		for (int i : indexes)
-			re = re.child(i);
-		return re;
-	}
+    public ZBlock desc(int... indexes) {
+        ZBlock re = this;
+        for (int i : indexes)
+            re = re.child(i);
+        return re;
+    }
 
-	public ZBlock child(int index) {
-		return children.get(index);
-	}
+    public ZBlock child(int index) {
+        return children.get(index);
+    }
 
-	public int countMyTypeInAncestors() {
-		List<ZBlock> list = ancestors();
-		int re = 0;
-		for (ZBlock p : list)
-			if (p.type == type)
-				re++;
-		return re;
-	}
+    public int countMyTypeInAncestors() {
+        List<ZBlock> list = ancestors();
+        int re = 0;
+        for (ZBlock p : list)
+            if (p.type == type)
+                re++;
+        return re;
+    }
 
-	public List<ZBlock> ancestors() {
-		List<ZBlock> list = new ArrayList<ZBlock>();
-		ZBlock me = this.parent;
-		do {
-			list.add(me);
-			me = me.parent;
-		} while (me != null);
-		return list;
-	}
+    public List<ZBlock> ancestors() {
+        List<ZBlock> list = new ArrayList<ZBlock>();
+        ZBlock me = this.parent;
+        do {
+            list.add(me);
+            me = me.parent;
+        } while (me != null);
+        return list;
+    }
 
-	public boolean hasChildren() {
-		return children.size() > 0;
-	}
+    public boolean hasChildren() {
+        return children.size() > 0;
+    }
 
-	public ZBlock setParent(ZBlock parent) {
-		this.parent = parent;
-		this.setDoc(parent.getDoc());
-		return this;
-	}
+    public ZBlock setParent(ZBlock parent) {
+        this.parent = parent;
+        this.setDoc(parent.getDoc());
+        return this;
+    }
 
-	public ZBlock getParent() {
-		return parent;
-	}
+    public ZBlock getParent() {
+        return parent;
+    }
 
-	public ZDoc getDoc() {
-		if (null != doc)
-			return doc;
-		if (null != parent) {
-			doc = parent.getDoc();
-			return doc;
-		}
-		return null;
-	}
+    public ZDoc getDoc() {
+        if (null != doc)
+            return doc;
+        if (null != parent) {
+            doc = parent.getDoc();
+            return doc;
+        }
+        return null;
+    }
 
-	public ZBlock setDoc(ZDoc doc) {
-		this.doc = doc;
-		for (ZBlock chd : children)
-			chd.setDoc(doc);
-		return this;
-	}
+    public ZBlock setDoc(ZDoc doc) {
+        this.doc = doc;
+        for (ZBlock chd : children)
+            chd.setDoc(doc);
+        return this;
+    }
 
-	public String getText() {
-		StringBuilder sb = new StringBuilder();
-		for (ZEle ele : eles)
-			sb.append(ele.getText());
-		if (this.isCode())
-			return sb.toString();
-		return Strings.trim(sb);
-	}
+    public String getText() {
+        StringBuilder sb = new StringBuilder();
+        for (ZEle ele : eles)
+            sb.append(ele.getText());
+        if (this.isCode())
+            return sb.toString();
+        return Strings.trim(sb);
+    }
 
-	private String getString() {
-		if (isHr())
-			return Strings.dup('-', 10);
-		if (null != getIndexRange()) {
-			return String.format("#index:%s", getIndexRange().toString());
-		}
-		StringBuilder sb = new StringBuilder();
-		for (ZEle ele : eles)
-			sb.append(ele.toString());
-		return sb.toString();
-	}
+    private String getString() {
+        if (isHr())
+            return Strings.dup('-', 10);
+        if (null != getIndexRange()) {
+            return String.format("#index:%s", getIndexRange().toString());
+        }
+        StringBuilder sb = new StringBuilder();
+        for (ZEle ele : eles)
+            sb.append(ele.toString());
+        return sb.toString();
+    }
 
-	public ZBlock setText(String text) {
-		eles.clear();
-		append(ZD.ele(text));
-		return this;
-	}
+    public ZBlock setText(String text) {
+        eles.clear();
+        append(ZD.ele(text));
+        return this;
+    }
 
-	/**
-	 * Zero base, doc.root.depth == 0 ;
-	 * 
-	 * @return
-	 */
-	public int depth() {
-		if (null == parent)
-			return 0;
-		return parent.depth() + 1;
-	}
+    /**
+     * Zero base, doc.root.depth == 0 ;
+     * 
+     * @return
+     */
+    public int depth() {
+        if (null == parent)
+            return 0;
+        return parent.depth() + 1;
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public String getTitle() {
+        return title;
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-	public ZType getType() {
-		return type;
-	}
+    public ZType getType() {
+        return type;
+    }
 
-	public ZBlock setType(ZType type) {
-		this.type = type;
-		return this;
-	}
+    public ZBlock setType(ZType type) {
+        this.type = type;
+        return this;
+    }
 
-	public boolean isOL() {
-		return ZType.OL == type;
-	}
+    public boolean isOL() {
+        return ZType.OL == type;
+    }
 
-	public boolean isOLI() {
-		return ZType.OLI == type;
-	}
+    public boolean isOLI() {
+        return ZType.OLI == type;
+    }
 
-	public boolean isUL() {
-		return ZType.UL == type;
-	}
+    public boolean isUL() {
+        return ZType.UL == type;
+    }
 
-	public boolean isULI() {
-		return ZType.ULI == type;
-	}
+    public boolean isULI() {
+        return ZType.ULI == type;
+    }
 
-	public boolean isLI() {
-		return ZType.OLI == type || ZType.ULI == type;
-	}
+    public boolean isLI() {
+        return ZType.OLI == type || ZType.ULI == type;
+    }
 
-	public boolean isCode() {
-		return ZType.CODE == type;
-	}
+    public boolean isCode() {
+        return ZType.CODE == type;
+    }
 
-	public boolean isTable() {
-		return ZType.TABLE == type;
-	}
+    public boolean isTable() {
+        return ZType.TABLE == type;
+    }
 
-	public boolean isRow() {
-		return ZType.ROW == type;
-	}
+    public boolean isRow() {
+        return ZType.ROW == type;
+    }
 
-	public boolean isNormal() {
-		return null == type;
-	}
+    public boolean isNormal() {
+        return null == type;
+    }
 
-	public boolean isHr() {
-		return ZType.HR == type;
-	}
+    public boolean isHr() {
+        return ZType.HR == type;
+    }
 
-	public boolean isRoot() {
-		return null == parent;
-	}
+    public boolean isRoot() {
+        return null == parent;
+    }
 
-	public boolean isIndexRange() {
-		return null != indexRange;
-	}
+    public boolean isIndexRange() {
+        return null != indexRange;
+    }
 
-	public IntRange getIndexRange() {
-		return indexRange;
-	}
+    public IntRange getIndexRange() {
+        return indexRange;
+    }
 
-	public ZBlock setIndexRange(IntRange indexRange) {
-		this.indexRange = indexRange;
-		return this;
-	}
+    public ZBlock setIndexRange(IntRange indexRange) {
+        this.indexRange = indexRange;
+        return this;
+    }
 
-	public boolean isHeading() {
-		return isNormal() && children.size() > 0;
-	}
+    public boolean isHeading() {
+        return isNormal() && children.size() > 0;
+    }
 
-	public boolean isBlank() {
-		return null == type && eles.isEmpty();
-	}
+    public boolean isBlank() {
+        return null == type && eles.isEmpty();
+    }
 
-	/**
-	 * Alias of childCount()
-	 */
-	public int size() {
-		return children.size();
-	}
+    /**
+     * Alias of childCount()
+     */
+    public int size() {
+        return children.size();
+    }
 
-	public int childCount() {
-		return children.size();
-	}
+    public int childCount() {
+        return children.size();
+    }
 
-	public int eleCount() {
-		return eles.size();
-	}
+    public int eleCount() {
+        return eles.size();
+    }
 
-	public String toString() {
-		return toString(0);
-	}
+    public String toString() {
+        return toString(0);
+    }
 
-	String toString(int depth) {
-		StringBuilder sb = new StringBuilder();
-		sb.append(Strings.dup('\t', depth)).append(symbol()).append(getString()).append('\n');
-		sb.append(getChildrenString(depth));
-		return sb.toString();
-	}
+    String toString(int depth) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(Strings.dup('\t', depth))
+          .append(symbol())
+          .append(getString())
+          .append('\n');
+        sb.append(getChildrenString(depth));
+        return sb.toString();
+    }
 
-	String getChildrenString() {
-		return getChildrenString(null != parent ? 0 : -1);
-	}
+    String getChildrenString() {
+        return getChildrenString(null != parent ? 0 : -1);
+    }
 
-	String getChildrenString(int depth) {
-		StringBuilder sb = new StringBuilder();
-		Iterator<ZBlock> it = children.iterator();
-		while (it.hasNext())
-			sb.append(it.next().toString(depth + 1));
-		return sb.toString();
-	}
+    String getChildrenString(int depth) {
+        StringBuilder sb = new StringBuilder();
+        Iterator<ZBlock> it = children.iterator();
+        while (it.hasNext())
+            sb.append(it.next().toString(depth + 1));
+        return sb.toString();
+    }
 
-	String symbol() {
-		if (ZType.OL == type || ZType.UL == type) {
-			return String.format("%s - %d items", type.name(), children.size());
-		}
-		if (ZType.OLI == type)
-			return " # ";
-		if (ZType.ULI == type)
-			return " * ";
-		return "";
-	}
+    String symbol() {
+        if (ZType.OL == type || ZType.UL == type) {
+            return String.format("%s - %d items", type.name(), children.size());
+        }
+        if (ZType.OLI == type)
+            return " # ";
+        if (ZType.ULI == type)
+            return " * ";
+        return "";
+    }
 
-	public Iterator<ZBlock> iterator() {
-		return new ZDocIterator(this);
-	}
+    public Iterator<ZBlock> iterator() {
+        return new ZDocIterator(this);
+    }
 
-	public Node<ZIndex> buildIndex(IntRange range) {
-		Node<ZIndex> root = Nodes.create(ZD.index(null, doc.getTitle()));
-		for (ZBlock chd : children) {
-			if (chd.isHeading()) {
-				_buildIndex(root, range, chd);
-			}
-		}
-		return Funcs.formatZIndexNumber(root);
-	}
+    public Node<ZIndex> buildIndex(IntRange range) {
+        Node<ZIndex> root = Nodes.create(ZD.index(null, doc.getTitle()));
+        for (ZBlock chd : children) {
+            if (chd.isHeading()) {
+                _buildIndex(root, range, chd);
+            }
+        }
+        return Funcs.formatZIndexNumber(root);
+    }
 
-	private static void _buildIndex(Node<ZIndex> node, IntRange range, ZBlock me) {
-		int lvl = me.depth() - 1;
-		if (range.inon(lvl)) {
-			String anText = Funcs.evalAnchorName(me.getText());
-			Node<ZIndex> newNode = Nodes.create(ZD.index("#" + anText, me.getText()));
-			node.add(newNode);
-			node = newNode;
-		}
-		if (!range.lt(lvl)) {
-			for (ZBlock chd : me.children) {
-				if (chd.isHeading()) {
-					_buildIndex(node, range, chd);
-				}
-			}
-		}
-	}
+    private static void _buildIndex(Node<ZIndex> node, IntRange range, ZBlock me) {
+        int lvl = me.depth() - 1;
+        if (range.inon(lvl)) {
+            String anText = Funcs.evalAnchorName(me.getText());
+            Node<ZIndex> newNode = Nodes.create(ZD.index("#" + anText,
+                                                         me.getText()));
+            node.add(newNode);
+            node = newNode;
+        }
+        if (!range.lt(lvl)) {
+            for (ZBlock chd : me.children) {
+                if (chd.isHeading()) {
+                    _buildIndex(node, range, chd);
+                }
+            }
+        }
+    }
 
-	public List<ZEle> getImages() {
-		List<ZEle> list = new ArrayList<ZEle>();
-		Iterator<ZBlock> it = iterator();
-		while (it.hasNext()) {
-			ZBlock p = it.next();
-			for (ZEle ele : p.eles) {
-				if (ele.isImage())
-					list.add(ele);
-			}
-		}
-		return list;
-	}
+    public List<ZEle> getImages() {
+        List<ZEle> list = new ArrayList<ZEle>();
+        Iterator<ZBlock> it = iterator();
+        while (it.hasNext()) {
+            ZBlock p = it.next();
+            for (ZEle ele : p.eles) {
+                if (ele.isImage())
+                    list.add(ele);
+            }
+        }
+        return list;
+    }
 
-	public List<ZEle> getLinks() {
-		List<ZEle> list = new ArrayList<ZEle>();
-		Iterator<ZBlock> it = iterator();
-		while (it.hasNext()) {
-			ZBlock p = it.next();
-			for (ZEle ele : p.eles) {
-				if (ele.hasHref())
-					list.add(ele);
-			}
-		}
-		return list;
-	}
+    public List<ZEle> getLinks() {
+        List<ZEle> list = new ArrayList<ZEle>();
+        Iterator<ZBlock> it = iterator();
+        while (it.hasNext()) {
+            ZBlock p = it.next();
+            for (ZEle ele : p.eles) {
+                if (ele.hasHref())
+                    list.add(ele);
+            }
+        }
+        return list;
+    }
 
 }
